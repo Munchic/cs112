@@ -38,21 +38,25 @@ lin_est <- function(coefs, params) {
         coefs[7] * params[2] * params[4] + # educ:re75
         coefs[8] * params[1] * params[3] + # age:re74
         coefs[9] * params[1] * params[4] + # age:re75
-        coefs[10] * params[3] * params[4] # re74:re75
+        coefs[10] * params[1] * params[1] + # age:re75
+        coefs[11] * params[3] * params[4] # re74:re75
   return(est)
 }
+
+
+cntrl.idx <- which(lalonde$treat == 0)
+lalonde.cntrl <- lalonde[cntrl.idx, ]
 
 educ.q <- quantile(lalonde.cntrl$educ, c(0.5, 0.75))
 re74.q <- quantile(lalonde.cntrl$re74, c(0.5, 0.75))
 re75.q <- quantile(lalonde.cntrl$re75, c(0.5, 0.75))
 
-cntrl.idx <- which(lalonde$treat == 0)
-lalonde.cntrl <- lalonde[cntrl.idx, ]
-re78.lm <- lm(re78 ~ age + educ + re74 + re75 + educ*re74 + educ*re75
-              + age*re74 + age*re75 + age*age + re74*re75,
+re78.lm <- lm(re78 ~ age + educ + re74 + re75 + I(educ*re74) + I(educ*re75)
+              + I(age*re74) + I(age*re75) + I(age*age) + I(re74*re75),
               data = lalonde.cntrl)
 re78.coef.sim <- sim(re78.lm, 10000)
 coefs <- re78.coef.sim@coef
+head(coefs)
 
 # (a)
 re78.exp.med <- matrix(0, nrow = 55, ncol = 10000)
@@ -94,6 +98,7 @@ conf.int.exp.75q
 
 # (c)
 sigmas <- re78.coef.sim@sigma
+
 noise_matr <- matrix(0, ncol = 10000, nrow = 55)
 for (col in 1:10000) {
   noise_matr[, col] <- t(rnorm(55, 0, sigmas[col]))
@@ -171,7 +176,7 @@ r.squared <- function(y.act, y.pred) {
   return(1 - SSR / SST)
 }
 
-w.pred <- predict(plant.weight.lm, plant.growth)
+w.pred <- predict(plant.weight.lm, data = plant.growth)
 plant.growth$weight
 r.squared(plant.growth$weight, w.pred)
 
@@ -193,7 +198,7 @@ treat.hist <- hist(prob.pred[treat.idx], 100)
 ctrl.hist <- hist(prob.pred[ctrl.idx], 100)
 plot(ctrl.hist, col = alpha("blue", 0.4), xlab = "Probability of treatment")  
 plot(treat.hist, col = alpha("red", 0.3), add = T)
-legend("topright", inset = .05, title = "Probability of assignment",
+legend("topright", inset = .05, title = "Assigned group",
        c("treatment", "control"),
        fill = c(alpha("red", 0.3), alpha("blue", 0.4)), cex = 0.8)
 
