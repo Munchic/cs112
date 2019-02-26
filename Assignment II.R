@@ -71,7 +71,7 @@ conf.int.exp.med <- apply(re78.exp.med, 1, quantile, probs = c(0.025, 0.975))
 conf.int.exp.med
 
 plot(x = c(1:1), y = c(1:1), type = "n",
-     xlim = c(16, 56), ylim = c(0, 10000),
+     xlim = c(16, 56), ylim = c(0, 13000),
      xlab = "Age (years)",
      ylab = "Revenue in year 1978, re78 ($)",
      xaxp  = c(15, 55, 4))
