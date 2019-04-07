@@ -36,8 +36,9 @@ mb.2 <- MatchBalance(fake$treat ~ fake$age + fake$educ + fake$black + fake$hisp 
                        fake$u75 + fake$age:fake$educ + fake$age:fake$black +
                        fake$married:fake$black + fake$married:fake$educ, match.out = mout.2)
 
-?Match
+?GenMatch
 ?lapply
+
 
 library(Matching)
 
